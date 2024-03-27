@@ -26,10 +26,7 @@ const Register = () => {
   const { username, matricNo, registeredCourses, setRegisteredCourses } =
     useUserStore();
   const [currentCourses, setCurrentCourses] = React.useState<Course[]>();
-  const [firstSemesterCourses, setFirstSemesterCourses] =
-    React.useState<Course[]>();
-  const [secondSemesterCourses, setSecondSemesterCourses] =
-    React.useState<Course[]>();
+
   const [currentScene, setCurrentScene] = React.useState<
     "Paid" | "Unpaid" | "Preview"
   >("Unpaid");
@@ -62,9 +59,6 @@ const Register = () => {
     const secondSemesterCourses = registeredCourses.filter(
       (course: Course) => course.semester === "2nd"
     );
-
-    setFirstSemesterCourses(firstSemesterCourses);
-    setSecondSemesterCourses(secondSemesterCourses);
 
     const firstSemesterCreditLoad = firstSemesterCourses.reduce(
       (acc: number, course: Course) => acc + course.creditLoad,
