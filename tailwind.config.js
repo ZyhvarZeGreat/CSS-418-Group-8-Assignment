@@ -18,9 +18,6 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        clash: ['Clash Display Variable', 'sans-serif'],
-        spaceGrotesk: ['Space Grotesk ', 'sans-serif'],
-        graphik: ['GraphikTrial-Regular', 'sans-serif'],
         jakarta: ['Plus Jakarta Sans', 'sans-serif'],
         mono: ['Space Mono', 'sans-serif'],
       },

@@ -73,7 +73,7 @@ const Register = () => {
     console.log(firstSemesterCreditLoad, secondSemesterCreditLoad);
 
     if (!registeredCourses.includes(course)) {
-      if (firstSemesterCreditLoad < 12 && secondSemesterCreditLoad < 17) {
+      if (firstSemesterCreditLoad < 21 && secondSemesterCreditLoad < 23) {
         registeredCourses.push(course);
         toast(`Registered ${course.courseCode}`, {
           className:
@@ -135,8 +135,8 @@ const Register = () => {
       </div>
 
       {currentScene === "Unpaid" && (
-        <div className="h-[80%] flex items-center justify-center">
-          <form>
+        <div className="h-[80%]  flex items-center justify-center">
+          <form className="">
             <Card className="w-[600px] h-[50vh]">
               <div className="flex w-full items-center justify-between font-mono py-2"></div>
 
@@ -153,8 +153,9 @@ const Register = () => {
                       className="flex flex-col gap-3 text-md"
                       htmlFor="product-code "
                     >
-                      Name
+                      Approve Payment
                       <Input
+                        disabled={true}
                         className="font-normal text-md"
                         placeholder="Pay ₦39950"
                       />
@@ -189,8 +190,8 @@ const Register = () => {
         </div>
       )}
       {currentScene === "Paid" && (
-        <div className="h-[80%] flex items-center justify-center">
-          <form>
+        <div className="h-[80%]  flex items-center justify-center">
+          <form className=" overflow-y-scroll">
             <Card className=" max-w-[400px]  md:max-w-[1000px]  ">
               <div className="flex w-full items-center justify-between font-mono py-2"></div>
 
@@ -244,7 +245,7 @@ const Register = () => {
       )}
 
       {currentScene === "Preview" && (
-        <div className="h-[80%] flex items-center justify-center">
+        <div className="h-[80%]  flex items-center justify-center">
           <form>
             <Card className=" max-w-[400px]  md:max-w-[1000px] xl:w-[800px]  ">
               <div className="flex w-full items-center justify-between font-mono py-2"></div>
