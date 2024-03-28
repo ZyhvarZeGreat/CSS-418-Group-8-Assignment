@@ -13,6 +13,7 @@ import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import {
   Table,
   TableBody,
@@ -22,42 +23,16 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import {
-  PDFDownloadLink,
-  Page,
-  Text,
-  View,
-  Document,
-  StyleSheet,
-} from "@react-pdf/renderer";
+import Doc from "./Doc";
 
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "row",
-    backgroundColor: "#E4E4E4",
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    flexGrow: 1,
-  },
-});
-
-const MyDoc = () => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text>Section #1</Text>
-      </View>
-      <View style={styles.section}>
-        <Text>Section #2</Text>
-      </View>
-    </Page>
-  </Document>
-);
 const Register = () => {
-  const { username, matricNo, registeredCourses, setRegisteredCourses } =
-    useUserStore();
+  const {
+    username,
+    matricNo,
+    department,
+    registeredCourses,
+    setRegisteredCourses,
+  } = useUserStore();
   const [currentCourses, setCurrentCourses] = React.useState<Course[]>();
 
   const [currentScene, setCurrentScene] = React.useState<
@@ -388,7 +363,17 @@ const Register = () => {
                   onClick={() => {}}
                   className=" text-md bg-black text-white font-jakarta h-9 px-10"
                 >
-                  <PDFDownloadLink document={<MyDoc />} fileName="somename.pdf">
+                  <PDFDownloadLink
+                    document={
+                      <Doc
+                        data={currentCourses}
+                        username={username}
+                        matricNo={matricNo}
+                        department={department}
+                      />
+                    }
+                    fileName={`${username}-${matricNo}.pdf`}
+                  >
                     {({ loading }) =>
                       loading ? "Loading document..." : "Download now!"
                     }

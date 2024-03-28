@@ -13,7 +13,8 @@ import useUserStore from "../store/useUserStore";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { setUsername, setMatricNo, password, setPassword } = useUserStore();
+  const { setDepartment, setUsername, setMatricNo, password, setPassword } =
+    useUserStore();
 
   const navigate = useNavigate();
 
@@ -32,7 +33,7 @@ const Login = () => {
   return (
     <div className="flex  h-screen w-screen items-center justify-center">
       <form>
-        <Card className="w-[600px] h-[50vh]">
+        <Card className="w-[600px] h-[33rem]">
           <div className="flex w-full items-center justify-between font-mono py-2"></div>
 
           <CardHeader className="py-8">
@@ -58,6 +59,24 @@ const Login = () => {
                   />
                 </Label>
               </div>
+
+              <div className="space-y-1 font-jakarta  font-light">
+                <Label
+                  className="flex flex-col gap-3 text-md"
+                  htmlFor="product-name"
+                >
+                  Department
+                  <Input
+                    onChange={(e) => {
+                      setDepartment(e.target.value);
+                    }}
+                    className="font-normal text-md"
+                    id="department"
+                    placeholder="Department"
+                  />
+                </Label>
+              </div>
+
               <div className="space-y-1 font-jakarta  font-light">
                 <Label
                   className="flex flex-col gap-3 text-md"
