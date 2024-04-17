@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import { Course, Level, levelCourseData } from "./data";
+import { supabaseCourse } from "./data";
 import useUserStore from "../store/useUserStore";
 import { toast } from "sonner";
 import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons";
@@ -24,66 +24,85 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import Doc from "./Doc";
+import { supabase } from "../../utils/supabaseClient";
+import { useQuery } from "react-query";
 
 const Register = () => {
-  const {
-    username,
-    matricNo,
-    department,
-    registeredCourses,
-    setRegisteredCourses,
-  } = useUserStore();
-  const [currentCourses, setCurrentCourses] = React.useState<Course[]>();
+  const { user, registeredCourses, setRegisteredCourses } = useUserStore();
+  const [currentCourses, setCurrentCourses] = React.useState<any>();
 
   const [currentScene, setCurrentScene] = React.useState<
     "Paid" | "Unpaid" | "Preview"
   >("Unpaid");
 
+  console.log(user);
+
+  const fetchCourses = async () => {
+    const { data, error } = await supabase.from("courses").select("*");
+    // Example query to fetch courses data
+    if (error) {
+      throw error;
+    }
+    return data;
+  };
+  const { data, isLoading, isError } = useQuery("courses", fetchCourses);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching data</div>;
+
   const handleSelectLevel = (
-    course: Level[]
+    course: supabaseCourse[] | undefined
   ): React.ChangeEventHandler<HTMLSelectElement> => {
     return (event: React.ChangeEvent<HTMLSelectElement>) => {
       setRegisteredCourses([]);
+      console.log(registeredCourses);
       const currentLevel = event.target.value;
+      console.log(currentLevel.split(" ")[0]);
       const currentCourses =
-        course.find((course) => course.level === currentLevel) ?? course[0];
-
-      setCurrentCourses(currentCourses.courses);
-
+        data &&
+        course?.filter(
+          (course) =>
+            course.course_level.toString() === currentLevel.split(" ")[0]
+        );
+      console.log(currentCourses);
+      console.log(registeredCourses);
+      if (data) {
+        setCurrentCourses(currentCourses);
+      }
       return currentCourses;
     };
   };
-
-  const selectHandler = handleSelectLevel(levelCourseData);
+  // console.log(data);
+  const selectHandler = handleSelectLevel(data);
 
   const handleRegisterCourses = (
-    course: Course,
+    course: supabaseCourse,
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
     const firstSemesterCourses = registeredCourses.filter(
-      (course: Course) => course.semester === "1st"
+      (course: supabaseCourse) => course.semester === "1st"
     );
     const secondSemesterCourses = registeredCourses.filter(
-      (course: Course) => course.semester === "2nd"
+      (course: supabaseCourse) => course.semester === "2nd"
     );
 
     const firstSemesterCreditLoad = firstSemesterCourses.reduce(
-      (acc: number, course: Course) => acc + course.creditLoad,
+      (acc: number, course: supabaseCourse) => acc + course.credit_load,
       0
     );
 
     const secondSemesterCreditLoad = secondSemesterCourses.reduce(
-      (acc: number, course: Course) => acc + course.creditLoad,
+      (acc: number, course: supabaseCourse) => acc + course.credit_load,
       0
     );
 
     console.log(firstSemesterCreditLoad, secondSemesterCreditLoad);
 
     if (!registeredCourses.includes(course)) {
-      if (firstSemesterCreditLoad < 21 && secondSemesterCreditLoad < 23) {
+      if (firstSemesterCreditLoad < 21 || secondSemesterCreditLoad < 23) {
         registeredCourses.push(course);
-        toast(`Registered ${course.courseCode}`, {
+        toast(`Registered ${course.course_code}`, {
           className:
             "font-mono text-sm  py-4 flex items-center justify-start border border-black h-[4rem]",
           duration: 4000,
@@ -99,7 +118,7 @@ const Register = () => {
       }
     } else {
       toast(
-        `${course.courseCode} has already been registered, you can not register a course twice `,
+        `${course.course_code} has already been registered, you can not register a course twice `,
         {
           className:
             "font-mono text-sm text-start   py-4 flex items-center justify-center border border-black h-[6rem]",
@@ -111,26 +130,55 @@ const Register = () => {
     console.log(registeredCourses);
   };
 
-  const levelOptions = currentCourses?.map((courses, i) => {
-    return (
-      <div
-        key={i}
-        className="h-[6rem] bg-gray-200  text-black flex justify-between gap-6"
-      >
-        <div className=" grid grid-cols-6 w-full">
-          <p className="col-span-1 text-sm "> {courses.courseCode} </p>
-          <p className="col-span-2 text-sm"> {courses.courseTitle} </p>
-          <p className="col-span-1 text-sm"> {courses.nature} </p>
-          <p className="col-span-1 text-sm"> {courses.creditLoad} </p>
-          <p className="col-span-1 text-sm"> {courses.semester} </p>
-        </div>
+  const levelOptions = currentCourses?.map(
+    (courses: supabaseCourse, i: number) => {
+      return (
+        <div
+          key={i}
+          className="h-[6rem] bg-gray-200  text-black flex justify-between gap-6"
+        >
+          <div className=" grid grid-cols-6 w-full">
+            <p className="col-span-1 text-sm "> {courses.course_code} </p>
+            <p className="col-span-2 text-sm"> {courses.course_title} </p>
+            <p className="col-span-1 text-sm"> {courses.nature} </p>
+            <p className="col-span-1 text-sm"> {courses.credit_load} </p>
+            <p className="col-span-1 text-sm"> {courses.semester} </p>
+          </div>
 
-        <Button onClick={(e) => handleRegisterCourses(courses, e)}>
-          Add Course
-        </Button>
-      </div>
-    );
-  });
+          <Button onClick={(e) => handleRegisterCourses(courses, e)}>
+            Add Course
+          </Button>
+        </div>
+      );
+    }
+  );
+
+  // async function registerCourses(user_id: number, courses: supabaseCourse[]) {
+  //   try {
+  //     const { data, error } = await supabase.from("registered_courses").insert(
+  //       courses.map((course) => ({
+  //         user_id,
+  //         course_id: course.course_id,
+  //         course_code: course.course_code,
+  //         course_title: course.course_title,
+  //         credit_load: course.credit_load,
+  //         semester: course.semester,
+  //         nature: course.nature,
+  //         course_level: course.course_level,
+
+  //       }))
+  //     );
+
+  //     if (error) {
+  //       throw error;
+  //     }
+
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error registering courses:", error);
+  //     throw error;
+  //   }
+  // }
 
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center">
@@ -138,8 +186,8 @@ const Register = () => {
         <h1 className="text-2xl mb-3 font-medium">
           Course Registration Portal
         </h1>
-        <h3 className="text-xl">Welcome, {username} </h3>
-        <p className="text-xl">Matric No - {matricNo}</p>
+        <h3 className="text-xl">Welcome, {user?.user_metadata?.name} </h3>
+        <p className="text-xl">Matric No - {user?.user_metadata?.matricNo} </p>
       </div>
 
       {currentScene === "Unpaid" && (
@@ -216,7 +264,7 @@ const Register = () => {
                       className="w-[95%] bg-gray-100 border border-black/20 py-2 rounded-sm"
                       onChange={selectHandler}
                     >
-                      <option value="" disabled selected hidden>
+                      <option value="" disabled>
                         Please select your current level
                       </option>
 
@@ -264,121 +312,128 @@ const Register = () => {
                 </CardTitle>
               </CardHeader>
 
-              <CardContent className="overflow-y-scroll">
-                <Table className="">
-                  <TableCaption>
-                    First Semester Courses
-                    <h3 className="mr-4 text-black font-semibold">
-                      Credit Units:{" "}
-                      {currentCourses
-                        ?.filter((course: Course) => course.semester === "1st")
-                        .reduce(
-                          (acc: number, course: Course) =>
-                            acc + course.creditLoad,
-                          0
-                        )}
-                    </h3>
-                  </TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[100px]">Course Code</TableHead>
-                      <TableHead>Course Title</TableHead>
-                      <TableHead>Credit Load</TableHead>
-                      <TableHead className="text-right">Semester</TableHead>
-                      <TableHead className="text-right">Nature</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="overflow-y-scroll">
-                    {currentCourses
-                      ?.filter((course: Course) => course.semester === "1st")
-                      .map((course, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <TableCell className="font-medium">
-                              {course?.courseCode}
-                            </TableCell>
-                            <TableCell>{course?.courseTitle} </TableCell>
-                            <TableCell>{course.creditLoad}</TableCell>
-                            <TableCell className="text-right">
-                              {course.semester}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {course.nature}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                  </TableBody>
-                </Table>
+              <CardContent className="overflow-hidden">
+                <div className="h-[20rem]  overflow-y-scroll">
+                  <Table className="">
+                    <TableCaption>
+                      First Semester Courses
+                      <h3 className="mr-4 text-black font-semibold">
+                        Credit Units:{" "}
+                        {registeredCourses
+                          ?.filter(
+                            (course: supabaseCourse) =>
+                              course.semester === "1st"
+                          )
+                          .reduce(
+                            (acc: number, course: supabaseCourse) =>
+                              acc + course.credit_load,
+                            0
+                          )}
+                      </h3>
+                    </TableCaption>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">Course Code</TableHead>
+                        <TableHead>Course Title</TableHead>
+                        <TableHead>Credit Load</TableHead>
+                        <TableHead className="text-right">Semester</TableHead>
+                        <TableHead className="text-right">Nature</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="overflow-y-scroll">
+                      {registeredCourses
+                        ?.filter(
+                          (course: supabaseCourse) => course.semester === "1st"
+                        )
+                        .map((course: supabaseCourse, i: number) => {
+                          return (
+                            <TableRow key={i}>
+                              <TableCell className="font-medium">
+                                {course?.course_code}
+                              </TableCell>
+                              <TableCell>{course?.course_title} </TableCell>
+                              <TableCell>{course.credit_load}</TableCell>
+                              <TableCell className="text-right">
+                                {course.semester}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {course.nature}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
 
-                <Table>
-                  <TableCaption className="  w-full">
-                    2nd Semester Courses
-                    <h3 className="mr-4 text-black font-semibold">
-                      Credit Units:
-                      {currentCourses
-                        ?.filter((course: Course) => course.semester === "2nd")
-                        .reduce(
-                          (acc: number, course: Course) =>
-                            acc + course.creditLoad,
-                          0
-                        )}
-                    </h3>
-                  </TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[100px]">Course Code</TableHead>
-                      <TableHead>Course Title</TableHead>
-                      <TableHead>Credit Load</TableHead>
-                      <TableHead className="text-right">Semester</TableHead>
-                      <TableHead className="text-right">Nature</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="overflow-y-scroll">
-                    {currentCourses
-                      ?.filter((course: Course) => course.semester === "2nd")
-                      .map((course, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <TableCell className="font-medium">
-                              {course?.courseCode}
-                            </TableCell>
-                            <TableCell>{course?.courseTitle} </TableCell>
-                            <TableCell>{course.creditLoad}</TableCell>
-                            <TableCell className="text-right">
-                              {course.semester}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {course.nature}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                  </TableBody>
-                </Table>
+                  <Table>
+                    <TableCaption className="  w-full">
+                      2nd Semester Courses
+                      <h3 className="mr-4 text-black font-semibold">
+                        Credit Units:
+                        {registeredCourses
+                          ?.filter(
+                            (course: supabaseCourse) =>
+                              course.semester === "2nd"
+                          )
+                          .reduce(
+                            (acc: number, course: supabaseCourse) =>
+                              acc + course.credit_load,
+                            0
+                          )}
+                      </h3>
+                    </TableCaption>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">Course Code</TableHead>
+                        <TableHead>Course Title</TableHead>
+                        <TableHead>Credit Load</TableHead>
+                        <TableHead className="text-right">Semester</TableHead>
+                        <TableHead className="text-right">Nature</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="overflow-y-scroll">
+                      {registeredCourses
+                        ?.filter(
+                          (course: supabaseCourse) => course.semester === "2nd"
+                        )
+                        .map((course: supabaseCourse, i: number) => {
+                          return (
+                            <TableRow key={i}>
+                              <TableCell className="font-medium">
+                                {course?.course_code}
+                              </TableCell>
+                              <TableCell>{course?.course_title} </TableCell>
+                              <TableCell>{course.credit_load}</TableCell>
+                              <TableCell className="text-right">
+                                {course.semester}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {course.nature}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
 
               <CardFooter className="py-4">
-                <Button
-                  onClick={() => {}}
-                  className=" text-md bg-black text-white font-jakarta h-9 px-10"
+                <PDFDownloadLink
+                  document={
+                    <Doc
+                      data={registeredCourses}
+                      username={user?.user_metadata?.name}
+                      matricNo={user?.user_metadata?.matric_no}
+                      department={user?.user_metadata?.department}
+                    />
+                  }
+                  fileName={`${user?.user_metadata?.name}-${user?.user_metadata?.matricNo}.pdf`}
                 >
-                  <PDFDownloadLink
-                    document={
-                      <Doc
-                        data={currentCourses}
-                        username={username}
-                        matricNo={matricNo}
-                        department={department}
-                      />
-                    }
-                    fileName={`${username}-${matricNo}.pdf`}
-                  >
-                    {({ loading }) =>
-                      loading ? "Loading document..." : "Download now!"
-                    }
-                  </PDFDownloadLink>
-                </Button>
+                  {({ loading }) =>
+                    loading ? "Loading document..." : "Download now!"
+                  }
+                </PDFDownloadLink>
               </CardFooter>
             </Card>
           </form>

@@ -1,7 +1,18 @@
 export interface Course {
+  id?: number;
   courseCode: string;
   courseTitle: string;
   creditLoad: number;
+  semester: string;
+  nature: string;
+}
+
+export interface supabaseCourse {
+  course_id: number;
+  course_level: number;
+  course_code: string;
+  course_title: string;
+  credit_load: number;
   semester: string;
   nature: string;
 }

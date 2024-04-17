@@ -16,10 +16,10 @@ import {
 //   TableHeader,
 //   TableRow,
 // } from "../../components/ui/table";
-import { Course } from "./data";
+import { supabaseCourse } from "./data";
 
 type Props = {
-  data?: Course[];
+  data?: supabaseCourse[];
   username: string | null;
   department: string | null;
   matricNo: string | null;
@@ -137,19 +137,19 @@ const Doc = (props: Props) => (
           </View>
         </View>
         {props.data
-          ?.filter((course: Course) => course.semester === "1st")
+          ?.filter((course: supabaseCourse) => course.semester === "1st")
           .map((course, i) => {
             return (
               <Fragment key={i}>
                 <View style={{ width: "100%", flexDirection: "row" }}>
                   <View style={[styles.tbody, styles.tbody2]}>
-                    <Text>{course.courseCode}</Text>
+                    <Text>{course.course_code}</Text>
                   </View>
                   <View style={styles.tbody}>
-                    <Text>{course.courseTitle} </Text>
+                    <Text>{course.course_title} </Text>
                   </View>
                   <View style={styles.tbody}>
-                    <Text>{course.creditLoad}</Text>
+                    <Text>{course.credit_load}</Text>
                   </View>
                   <View style={styles.tbody}>
                     <Text>{course.semester}</Text>
@@ -177,9 +177,12 @@ const Doc = (props: Props) => (
               <Text>
                 Credit Units:
                 {props.data
-                  ?.filter((course: Course) => course.semester === "1st")
+                  ?.filter(
+                    (course: supabaseCourse) => course.semester === "1st"
+                  )
                   .reduce(
-                    (acc: number, course: Course) => acc + course.creditLoad,
+                    (acc: number, course: supabaseCourse) =>
+                      acc + course.credit_load,
                     0
                   )}
               </Text>
@@ -207,19 +210,19 @@ const Doc = (props: Props) => (
           </View>
         </View>
         {props.data
-          ?.filter((course: Course) => course.semester === "2nd")
+          ?.filter((course: supabaseCourse) => course.semester === "2nd")
           .map((course, i) => {
             return (
               <Fragment key={i}>
                 <View style={{ width: "100%", flexDirection: "row" }}>
                   <View style={[styles.tbody, styles.tbody2]}>
-                    <Text>{course.courseCode}</Text>
+                    <Text>{course.course_code}</Text>
                   </View>
                   <View style={styles.tbody}>
-                    <Text>{course.courseTitle} </Text>
+                    <Text>{course.course_title} </Text>
                   </View>
                   <View style={styles.tbody}>
-                    <Text>{course.creditLoad}</Text>
+                    <Text>{course.credit_load}</Text>
                   </View>
                   <View style={styles.tbody}>
                     <Text>{course.semester}</Text>
@@ -247,9 +250,12 @@ const Doc = (props: Props) => (
               <Text>
                 Credit Units:
                 {props.data
-                  ?.filter((course: Course) => course.semester === "2nd")
+                  ?.filter(
+                    (course: supabaseCourse) => course.semester === "2nd"
+                  )
                   .reduce(
-                    (acc: number, course: Course) => acc + course.creditLoad,
+                    (acc: number, course: supabaseCourse) =>
+                      acc + course.credit_load,
                     0
                   )}
               </Text>
