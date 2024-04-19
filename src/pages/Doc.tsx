@@ -5,7 +5,6 @@ import {
   View,
   Document,
   StyleSheet,
-  Font,
 } from "@react-pdf/renderer";
 // import {
 //   Table,
@@ -24,14 +23,13 @@ type Props = {
   department: string | null;
   matricNo: string | null;
 };
-Font.register({
-  family: "Plus Jakarta",
-  src: "../../public/PlusJakartaSans-VariableFont_wght.ttf",
-});
+// Font.register({
+//   family: "Plus Jakarta",
+//   src: "PlusJakartaSans-VariableFont_wght.ttf",
+// });
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Plus Jakarta",
     fontSize: 11,
     paddingTop: 20,
     display: "flex",

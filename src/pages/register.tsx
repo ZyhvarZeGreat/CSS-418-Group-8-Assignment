@@ -35,7 +35,7 @@ const Register = () => {
     "Paid" | "Unpaid" | "Preview"
   >("Unpaid");
 
-  console.log(user);
+
 
   const fetchCourses = async () => {
     const { data, error } = await supabase.from("courses").select("*");
@@ -57,15 +57,12 @@ const Register = () => {
       setRegisteredCourses([]);
       console.log(registeredCourses);
       const currentLevel = event.target.value;
-      console.log(currentLevel.split(" ")[0]);
       const currentCourses =
         data &&
         course?.filter(
           (course) =>
             course.course_level.toString() === currentLevel.split(" ")[0]
         );
-      console.log(currentCourses);
-      console.log(registeredCourses);
       if (data) {
         setCurrentCourses(currentCourses);
       }
@@ -100,7 +97,7 @@ const Register = () => {
     console.log(firstSemesterCreditLoad, secondSemesterCreditLoad);
 
     if (!registeredCourses.includes(course)) {
-      if (firstSemesterCreditLoad < 21 || secondSemesterCreditLoad < 23) {
+      if (firstSemesterCreditLoad < 21 && secondSemesterCreditLoad < 23) {
         registeredCourses.push(course);
         toast(`Registered ${course.course_code}`, {
           className:
@@ -127,7 +124,6 @@ const Register = () => {
         }
       );
     }
-    console.log(registeredCourses);
   };
 
   const levelOptions = currentCourses?.map(
@@ -153,32 +149,7 @@ const Register = () => {
     }
   );
 
-  // async function registerCourses(user_id: number, courses: supabaseCourse[]) {
-  //   try {
-  //     const { data, error } = await supabase.from("registered_courses").insert(
-  //       courses.map((course) => ({
-  //         user_id,
-  //         course_id: course.course_id,
-  //         course_code: course.course_code,
-  //         course_title: course.course_title,
-  //         credit_load: course.credit_load,
-  //         semester: course.semester,
-  //         nature: course.nature,
-  //         course_level: course.course_level,
 
-  //       }))
-  //     );
-
-  //     if (error) {
-  //       throw error;
-  //     }
-
-  //     return data;
-  //   } catch (error) {
-  //     console.error("Error registering courses:", error);
-  //     throw error;
-  //   }
-  // }
 
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center">

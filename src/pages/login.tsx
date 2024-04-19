@@ -44,7 +44,6 @@ const Login = () => {
   const { errors } = formState;
 
   const handleSignIn = async (data: signType) => {
-    console.log(data);
     const { error } = await supabase.auth.signInWithPassword({
       email: data?.email,
       password: data?.password,
@@ -86,7 +85,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex  h-screen w-screen items-center justify-center">
+    <div className="flex font-jakarta  h-screen w-screen items-center justify-center">
       <form onSubmit={handleSubmit(onSubmitSignup)}>
         <Card className="w-[600px] ">
           <div className="flex w-full items-center justify-between font-mono py-2"></div>

@@ -18,8 +18,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
-        mono: ['Space Mono', 'sans-serif'],
+        jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+        mono: ['"Space Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
